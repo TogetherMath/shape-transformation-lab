@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 
 
 def run_transformation_by_matrix():
-    st.header("🟩 (1) 행렬을 통한 일차변환")
+    st.header("🟩 (1) 행렬을 통한 일차변환 시뮬레이터")
     st.markdown("여러 도형을 여러 행렬로 일차변환하는 실험을 해 보세요.")
 
 
