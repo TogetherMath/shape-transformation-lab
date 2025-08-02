@@ -69,13 +69,25 @@ def plot_shape(shape_type, shape, transformed, matrix, font_family, a=1, b=1, c=
     x_range = np.ptp(all_x)
     y_range = np.ptp(all_y)
     half_range = max(x_range, y_range) * 0.75
+    half_range = min(half_range, 20)  # 최대 20으로 제한
     if half_range < 1:
         half_range = 2
     fig.update_layout(
         width=600,
         height=600,
-        xaxis=dict(range=[x_center - half_range, x_center + half_range], zeroline=True, zerolinecolor='gray'),
-        yaxis=dict(range=[y_center - half_range, y_center + half_range], zeroline=True, zerolinecolor='gray'),
+        xaxis=dict(
+            range=[x_center - half_range, x_center + half_range],
+            zeroline=True,
+            zerolinecolor='gray',
+            showgrid=True,  # ✅ 보조선 추가
+            gridcolor='lightgray',  # ✅ 선 색상 설정 (선택)
+        ),
+        yaxis=dict(
+            range=[y_center - half_range, y_center + half_range],
+            zeroline=True,
+            zerolinecolor='gray',
+            scaleanchor='x'   # ✅ 이 위치가 맞습니다!
+        ),
         font=dict(family=font_family),
         legend=dict(x=0.01, y=0.99),
         margin=dict(l=0, r=0, t=10, b=0)
@@ -124,7 +136,7 @@ if menu == "행렬을 통한 일차변환":
             a = st.number_input("계수 a", value=1.0, step=0.1, format="%.1f")
             b = st.number_input("계수 b", value=1.0, step=0.1, format="%.1f")
             c = st.number_input("상수 c", value=2.0, step=0.1, format="%.1f")
-            x_vals = np.linspace(-5, 5, 400)
+            x_vals = np.linspace(-20, 20, 400)
             if b != 0:
                 y_vals = (c - a * x_vals) / b
             else:
@@ -133,10 +145,10 @@ if menu == "행렬을 통한 일차변환":
             shape = np.stack([x_vals, y_vals], axis=1)
 
         st.subheader("2×2 변환 행렬 입력")
-        a11 = st.number_input("a11", value=1, step=1, format="%d")
-        a12 = st.number_input("a12", value=-1, step=1, format="%d")
-        a21 = st.number_input("a21", value=1, step=1, format="%d")
-        a22 = st.number_input("a22", value=2, step=1, format="%d")
+        a11 = st.number_input("a11", value=1.0, step=0.1, format="%.1f")
+        a12 = st.number_input("a12", value=-1.0, step=0.1, format="%.1f")
+        a21 = st.number_input("a21", value=1.0, step=0.1, format="%.1f")
+        a22 = st.number_input("a22", value=2.0, step=0.1, format="%.1f")
         matrix = np.array([[a11, a12], [a21, a22]])
 
     with col2:
