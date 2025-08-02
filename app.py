@@ -202,7 +202,6 @@ elif menu == "복소평면에서의 변환":
     st.subheader("🔷 복소평면에서의 변환")
     st.write("복소수를 이용한 여러 변환을 실험할 수 있습니다.")
 
-    # ✅ 입력과 출력 영역 분할
     col1, col2 = st.columns([1, 1])
 
     with col1:
@@ -211,86 +210,112 @@ elif menu == "복소평면에서의 변환":
 
         # ✅ 도형 정의식 입력
         st.subheader("1️⃣ 원래 도형 정의: x, y의 관계식")
-        st.caption("제곱은 **로, 등호는 ==로 표기하세요.")
-        user_input_raw = st.text_input("예: x**2 + y**2 == 1", value="x**2 + y**2 == 1", key="definition_input")
+        st.caption("!!주의!! 제곱은 **로, 등호는 ==로 표기하세요.")
+        definition = st.text_input("예: x**2 + y**2 == 1", value="x**2 + y**2 == 1", key="definition_input")
 
         # ✅ 복소함수 입력
         st.subheader("2️⃣ 복소함수 입력: w = f(z)")
-        fz_input = st.text_input("예: z**2, 1/z, np.exp(z)", value="z+1")
+        fz_input = st.text_input("예: z**2, 1/z, z+1", value="z+1")
 
-    # ✅ 그리드 생성 및 Z 정의
-    x = np.linspace(-3, 3, 800)
-    y = np.linspace(-3, 3, 800)
-    X, Y = np.meshgrid(x, y)
-    Z = X + 1j * Y
+    # ✅ 자동 정의역 추정 및 마스킹
+    Z_selected = None
+    final_range = None
+    max_attempts = 15
+    # 원본 정의식 보존
+    original = definition
+    for attempt in range(max_attempts):
+        range_size = 3 + attempt * 2
+        N = 800
+        x = np.linspace(-range_size, range_size, N)
+        y = np.linspace(-range_size, range_size, N)
+        X, Y = np.meshgrid(x, y)
+        Z = X + 1j * Y
 
-    # ✅ 사용자 정의 등식 처리 (== → abs(lhs - rhs) < tol 로 변환)
-    def convert_eq_to_tol(expression, tol=0.01):
-        if "==" in expression:
-            parts = expression.split("==")
-            if len(parts) == 2:
-                lhs = parts[0].strip()
-                rhs = parts[1].strip()
-                return f"np.abs(({lhs}) - ({rhs})) < {tol}"
-        return expression
-
-    definition = convert_eq_to_tol(user_input_raw)
-
-    Z_selected = None  # 초기화
-    try:
-        local_vars = {
-            "x": X,
-            "y": Y,
-            "np": np,
-            "cmath": np,
-            "__builtins__": {}
-        }
-        mask = eval(definition, local_vars)
-        mask = np.array(mask, dtype=bool)
-        Z_selected = Z[mask]
-    except Exception as e:
-        st.error(f"도형 정의식 오류: {e}")
-
-    # ✅ 복소함수 적용
-    W = None
-    if Z_selected is not None and Z_selected.size > 0:
+        eps = (2 * range_size) / (N - 1)
+        eps *= 2  # 허용오차 배율 조정 (라인도 두께 보장)
         try:
-            W = eval(fz_input, {"z": Z_selected, "np": np, "cmath": np, "__builtins__": {}}, {})
+            local_vars = {"x": X, "y": Y, "np": np}
+            # 등식 비교일 때 동적 eps 사용
+            if "==" in original:
+                left, right = original.split("==")
+                L = eval(left, local_vars)
+                R = eval(right, local_vars)
+                mask = np.abs(L - R) < eps
+            else:
+                mask = eval(original, local_vars)
+            mask = np.array(mask, dtype=bool)
+            if mask.sum() > 0:
+                Z_selected = Z[mask]
+                final_range = range_size
+                break
+        except Exception:
+            continue
+
+    if Z_selected is None or Z_selected.size == 0:
+        st.error("도형 정의식 오류: 선택된 점이 없습니다. 정의식을 다시 확인해 주세요.")
+    else:
+        # ✅ 복소함수 적용
+        try:
+            W = eval(fz_input, {"z": Z_selected, "np": np})
         except Exception as e:
             st.error(f"복소함수 적용 오류: {e}")
+            W = None
 
-    # ✅ 시각화 (Plotly 사용)
-    with col2:
-        if W is not None:
-            import plotly.graph_objects as go
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(x=Z_selected.real, y=Z_selected.imag, mode='markers',
-                                     marker=dict(size=2, color='blue'), name='입력 도형 z'))
-            fig.add_trace(go.Scatter(x=W.real, y=W.imag, mode='markers',
-                                     marker=dict(size=2, color='red'), name='변환 도형 w'))
+        # ✅ 시각화
+        with col2:
+            if W is not None and getattr(W, 'size', 0) > 0:
+                import plotly.graph_objects as go
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(
+                    x=Z_selected.real, y=Z_selected.imag,
+                    mode='markers', marker=dict(size=2, color='blue'),
+                    name='입력 도형 z'
+                ))
+                fig.add_trace(go.Scatter(
+                    x=W.real, y=W.imag,
+                    mode='markers', marker=dict(size=2, color='red'),
+                    name='변환 도형 w'
+                ))
 
-            # 자동 스케일 조정
-            all_real = np.concatenate([Z_selected.real, W.real])
-            all_imag = np.concatenate([Z_selected.imag, W.imag])
-            if all_real.size > 0 and all_imag.size > 0:
-                x_min, x_max = all_real.min(), all_real.max()
-                y_min, y_max = all_imag.min(), all_imag.max()
-                x_margin = (x_max - x_min) * 0.1
-                y_margin = (y_max - y_min) * 0.1
-                fig.update_xaxes(range=[x_min - x_margin, x_max + x_margin])
-                fig.update_yaxes(range=[y_min - y_margin, y_max + y_margin])
+                # 축 및 그리드, 스케일 동기화
+                all_re = np.concatenate([Z_selected.real, W.real])
+                all_im = np.concatenate([Z_selected.imag, W.imag])
+                x_min, x_max = all_re.min(), all_re.max()
+                y_min, y_max = all_im.min(), all_im.max()
+                margin = max(x_max - x_min, y_max - y_min) * 0.1
+                fig.update_xaxes(
+                    range=[x_min - margin, x_max + margin],
+                    zeroline=True, zerolinecolor='gray',
+                    showgrid=True, gridcolor='lightgray',
+                    scaleanchor='y', scaleratio=1
+                )
+                fig.update_yaxes(
+                    range=[y_min - margin, y_max + margin],
+                    zeroline=True, zerolinecolor='gray',
+                    showgrid=True, gridcolor='lightgray',
+                    scaleanchor='x', scaleratio=1
+                )
+                fig.update_layout(
+                    title='복소함수를 통한 도형 변환',
+                    xaxis_title='Re', yaxis_title='Im',
+                    width=600, height=600, showlegend=True
+                )
+                st.plotly_chart(fig)
+            else:
+                st.warning("복소함수 적용 결과가 없습니다.")
 
-            fig.update_layout(
-                title="복소함수를 통한 도형 변환",
-                xaxis_title="Re",
-                yaxis_title="Im",
-                width=600,
-                height=600,
-                showlegend=True,
-            )
-            st.plotly_chart(fig)
-        else:
-            st.info("유효한 도형이 없거나 도형 점 개수가 부족합니다.")
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
