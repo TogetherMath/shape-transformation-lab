@@ -6,14 +6,17 @@ import os
 import plotly.graph_objects as go
 
 
-def run_matrix_transform():
-    st.header("🟩 (1) 행렬에 의한 일차변환 시뮬레이터")
+
+def run_symmetry_rotation():
+    st.header("🟨 (2) 대칭과 회전 조합 시뮬레이터")
+    st.write("이곳에 (2)번 시뮬레이터 내용을 구현할 예정입니다.")
+
 
 
 
 # ✅ 페이지 설정
-st.set_page_config(page_title="도형 변환 실험실", layout="wide")
-st.title("🔄 도형 변환 실험실")
+#st.set_page_config(page_title="도형 변환 실험실", layout="wide")
+#st.title("🔄 도형 변환 실험실")
 
 # ✅ 한글 폰트 설정
 font_path = './fonts/나눔 글꼴/나눔고딕/NanumFontSetup_TTF_GOTHIC/NanumGothic.ttf'
