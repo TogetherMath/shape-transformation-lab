@@ -210,12 +210,13 @@ elif menu == "복소평면에서의 변환":
 
         # ✅ 도형 정의식 입력
         st.subheader("1️⃣ 원래 도형 정의: x, y의 관계식")
-        st.caption("!!주의!! 제곱은 **로, 등호는 ==로 표기하세요.")
-        definition = st.text_input("예: x**2 + y**2 == 1", value="x**2 + y**2 == 1", key="definition_input")
+        st.caption("곱은 *로, 제곱은 **로, 등호는 ==로 표기하세요.")
+        definition = st.text_input("예: 2*y == x**2 + 1", value="x**2 + y**2 == 1", key="definition_input")
 
         # ✅ 복소함수 입력
         st.subheader("2️⃣ 복소함수 입력: w = f(z)")
-        fz_input = st.text_input("예: z**2, 1/z, z+1", value="z+1")
+        st.caption("허수 i는 1j로 표기하세요.")
+        fz_input = st.text_input("w =", value="(z - 1j)**2", key="function_input")
 
     # ✅ 자동 정의역 추정 및 마스킹
     Z_selected = None
@@ -234,7 +235,7 @@ elif menu == "복소평면에서의 변환":
         eps = (2 * range_size) / (N - 1)
         eps *= 2  # 허용오차 배율 조정 (라인도 두께 보장)
         try:
-            local_vars = {"x": X, "y": Y, "np": np}
+            local_vars = {"x": X, "y": Y, "np": np, "i": 1j}
             # 등식 비교일 때 동적 eps 사용
             if "==" in original:
                 left, right = original.split("==")
