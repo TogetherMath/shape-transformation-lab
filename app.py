@@ -209,23 +209,23 @@ elif menu == "복소평면에서의 변환":
         st.markdown("복소수 $z = x + iy$ 로 정의된 도형을 복소함수 $w = f(z)$ 를 통해 변환해 보세요.")
 
         # ✅ 도형 정의식 입력
-        st.subheader("1️⃣ 원래 도형 정의: x, y의 관계식")
-        st.caption("곱은 *로, 제곱은 **로, 등호는 ==로 표기하세요.")
+        st.subheader("1️⃣ z의 자취 : x, y의 관계식")
+        st.caption("!!Warning!! 곱은 *로, 제곱은 **로, 등호는 ==로 표기하세요.(파이썬표기법)")
         definition = st.text_input("예: 2*y == x**2 + 1", value="x**2 + y**2 == 1", key="definition_input")
 
         # ✅ 복소함수 입력
-        st.subheader("2️⃣ 복소함수 입력: w = f(z)")
-        st.caption("허수 i는 1j로 표기하세요.")
+        st.subheader("2️⃣ 복소함수식 입력 : w = f(z)")
+        st.caption("!!Warning!! 허수 i는 1j로 표기하세요.(파이썬 표기법)")
         fz_input = st.text_input("w =", value="(z - 1j)**2", key="function_input")
 
     # ✅ 자동 정의역 추정 및 마스킹
     Z_selected = None
     final_range = None
-    max_attempts = 15
+    max_attempts = 10
     # 원본 정의식 보존
     original = definition
     for attempt in range(max_attempts):
-        range_size = 3 + attempt * 2
+        range_size = 8 + attempt * 2
         N = 800
         x = np.linspace(-range_size, range_size, N)
         y = np.linspace(-range_size, range_size, N)
@@ -253,7 +253,7 @@ elif menu == "복소평면에서의 변환":
             continue
 
     if Z_selected is None or Z_selected.size == 0:
-        st.error("도형 정의식 오류: 선택된 점이 없습니다. 정의식을 다시 확인해 주세요.")
+        st.error("오류 : 식을 다시 확인해 주세요.")
     else:
         # ✅ 복소함수 적용
         try:
@@ -269,13 +269,13 @@ elif menu == "복소평면에서의 변환":
                 fig = go.Figure()
                 fig.add_trace(go.Scatter(
                     x=Z_selected.real, y=Z_selected.imag,
-                    mode='markers', marker=dict(size=2, color='blue'),
-                    name='입력 도형 z'
+                    mode='markers', marker=dict(size=4, color='blue'),
+                    name='변환 전 도형 z'
                 ))
                 fig.add_trace(go.Scatter(
                     x=W.real, y=W.imag,
-                    mode='markers', marker=dict(size=2, color='red'),
-                    name='변환 도형 w'
+                    mode='markers', marker=dict(size=4, color='red'),
+                    name='변환 후 도형 w'
                 ))
 
                 # 축 및 그리드, 스케일 동기화
