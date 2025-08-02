@@ -30,7 +30,7 @@ def plot_shape(shape_type, shape, transformed, matrix, font_family, a=1, b=1, c=
     fig.add_trace(go.Scatter(
         x=shape[:, 0], y=shape[:, 1],
         mode='lines+markers',
-        name='원래 도형',
+        name='변환전 도형',
         line=dict(color='blue'),
         marker=dict(color='blue')
     ))
@@ -39,7 +39,7 @@ def plot_shape(shape_type, shape, transformed, matrix, font_family, a=1, b=1, c=
     fig.add_trace(go.Scatter(
         x=transformed[:, 0], y=transformed[:, 1],
         mode='lines+markers',
-        name='변환된 도형',
+        name='변환후 도형',
         line=dict(color='red', dash='dash'),
         marker=dict(color='red')
     ))
@@ -327,3 +327,12 @@ elif menu == "복소평면에서의 변환":
 elif menu == "복소평면에서 평행이동과 회전이동의 결합":
     st.subheader("🌀 평행이동 + 회전이동")
     st.write("복소수의 덧셈과 곱셈을 통해 평행이동과 회전을 결합한 변환은 여전히 회전이동이 될까요?")
+
+
+
+
+
+
+
+
+
