@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import os
+import plotly.graph_objects as go
+
 
 # ✅ 페이지 설정
 st.set_page_config(page_title="도형 변환 실험실", layout="wide")
@@ -19,6 +21,66 @@ if os.path.exists(font_path):
 # ✅ 숫자 포맷 함수
 def format_number(n):
     return f"{n:.1f}".rstrip('0').rstrip('.') if n % 1 != 0 else str(int(n))
+
+# ✅ Plotly 버전 시각화 함수
+def plot_shape(shape_type, shape, transformed, matrix, font_family, a=1, b=1, c=0):
+    fig = go.Figure()
+
+    # 원래 도형
+    fig.add_trace(go.Scatter(
+        x=shape[:, 0], y=shape[:, 1],
+        mode='lines+markers',
+        name='원래 도형',
+        line=dict(color='blue'),
+        marker=dict(color='blue')
+    ))
+
+    # 변환된 도형
+    fig.add_trace(go.Scatter(
+        x=transformed[:, 0], y=transformed[:, 1],
+        mode='lines+markers',
+        name='변환된 도형',
+        line=dict(color='red', dash='dash'),
+        marker=dict(color='red')
+    ))
+
+    # 직선일 경우 변환된 점 하나 강조
+    if shape_type == "직선":
+        if b != 0:
+            base_point = np.array([0, c / b])
+        else:
+            base_point = np.array([c / a, 0])
+        new_point = np.dot(base_point, matrix.T)
+        fig.add_trace(go.Scatter(
+            x=[new_point[0]], y=[new_point[1]],
+            mode='markers',
+            name='변환된 점',
+            marker=dict(color='red', size=10, symbol='circle')
+        ))
+
+    # 축 범위 조절
+    all_x = np.concatenate([shape[:, 0], transformed[:, 0]])
+    all_y = np.concatenate([shape[:, 1], transformed[:, 1]])
+    if shape_type == "직선":
+        all_x = np.append(all_x, new_point[0])
+        all_y = np.append(all_y, new_point[1])
+    x_center = np.mean(all_x)
+    y_center = np.mean(all_y)
+    x_range = np.ptp(all_x)
+    y_range = np.ptp(all_y)
+    half_range = max(x_range, y_range) * 0.75
+    if half_range < 1:
+        half_range = 2
+    fig.update_layout(
+        width=600,
+        height=600,
+        xaxis=dict(range=[x_center - half_range, x_center + half_range], zeroline=True, zerolinecolor='gray'),
+        yaxis=dict(range=[y_center - half_range, y_center + half_range], zeroline=True, zerolinecolor='gray'),
+        font=dict(family=font_family),
+        legend=dict(x=0.01, y=0.99),
+        margin=dict(l=0, r=0, t=10, b=0)
+    )
+    return fig
 
 # ✅ 사이드바 메뉴
 menu = st.sidebar.radio("📂 메뉴를 선택하세요", [
@@ -78,65 +140,32 @@ if menu == "행렬을 통한 일차변환":
         matrix = np.array([[a11, a12], [a21, a22]])
 
     with col2:
-#################################
-        # ✅ 변환 적용
+        # 직선 관련 계수 기본값 선언 (에러 방지용)
+        if shape_type == "직선":
+            a, b, c = a, b, c
+        else:
+            a, b, c = 1, 1, 1
+
+        #변환적용
         transformed = np.dot(shape, matrix.T)
 
         st.subheader("시각화 결과")
-        fig, ax = plt.subplots(figsize=(6, 6))
-        ax.set_aspect('equal')
-
-        if shape_type in ["삼각형", "사각형", "원", "직선"]:
-            ax.plot(shape[:, 0], shape[:, 1], 'b-', label='원래 도형')
-            ax.plot(transformed[:, 0], transformed[:, 1], 'r--', label='변환된 도형')
-
-        # ✅ 원점 및 축
-        ax.axhline(0, color='gray')
-        ax.axvline(0, color='gray')
-        ax.plot(0, 0, 'ko', markersize=3)
-
-        # 💡 변환된 점 하나 찍기 (직선일 경우)
-        if shape_type == "직선":
-            if b != 0:
-                base_point = np.array([0, c / b])
-            else:
-                base_point = np.array([c / a, 0])
-            new_point = np.dot(base_point, matrix.T)
-            ax.plot(new_point[0], new_point[1], 'ro', markersize=8, label='변환된 점')
-
-        # 축 범위 자동 조절
-        all_x = np.concatenate([shape[:, 0], transformed[:, 0]])
-        all_y = np.concatenate([shape[:, 1], transformed[:, 1]])
-        if shape_type == "직선":
-            all_x = np.append(all_x, new_point[0])
-            all_y = np.append(all_y, new_point[1])
-        x_center = np.mean(all_x)
-        y_center = np.mean(all_y)
-        x_range = np.ptp(all_x)
-        y_range = np.ptp(all_y)
-        half_range = max(x_range, y_range) * 0.75
-        if half_range < 1:
-            half_range = 2
-        ax.set_xlim(x_center - half_range, x_center + half_range)
-        ax.set_ylim(y_center - half_range, y_center + half_range)
-
-        ax.legend(loc='upper left', prop=font_prop if font_prop else None)
-        plt.tight_layout()
-        st.pyplot(fig)
-
         st.subheader("수식 표시")
-        st.latex(rf"""
-        \text{{입력된 행렬}} = 
-        \begin{{bmatrix}}
-        {a11} & {a12} \\
-        {a21} & {a22}
-        \end{{bmatrix}}
-        """)
+        st.latex(
+            fr"""\text{{입력된 행렬}} =
+\begin{{bmatrix}}
+{a11} & {a12} \\
+{a21} & {a22}
+\end{{bmatrix}}"""
+        )
 
         if shape_type == "원":
             st.latex(rf"(x - {format_number(center[0])})^2 + (y - {format_number(center[1])})^2 = {format_number(radius)}^2")
         elif shape_type == "직선":
             st.latex(rf"\text{{입력된 직선:}} \quad {format_number(a)}x + {format_number(b)}y = {format_number(c)}")
+
+        fig = plot_shape(shape_type, shape, transformed, matrix, 'NanumGothic', a, b, c)
+        st.plotly_chart(fig, use_container_width=True)
 
 #######################################
 elif menu == "행렬을 통한 두 번의 대칭이동":
