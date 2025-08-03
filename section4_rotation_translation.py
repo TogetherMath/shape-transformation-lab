@@ -52,20 +52,54 @@ def run_rotation_translation():
 
         # ✅ 시각화
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=[z.real], y=[z.imag], mode='markers',
-                                 marker=dict(size=12, color='blue'), name='입력 z'))
-        fig.add_trace(go.Scatter(x=[w.real], y=[w.imag], mode='markers',
-                                 marker=dict(size=12, color='red'), name='변환 결과 w'))
-        fig.add_trace(go.Scatter(x=[alpha.real], y=[alpha.imag], mode='markers',
-                                 marker=dict(size=10, color='purple', symbol='x'), name='이동 전 수치 α'))
-        fig.add_trace(go.Scatter(x=[beta.real], y=[beta.imag], mode='markers',
-                                 marker=dict(size=10, color='orange', symbol='x'), name='이동 후 수치 β'))
 
-        fig.update_layout(
-            title="복소평면에서의 회전+평행이동 변환 시각화",
-            xaxis_title="Re", yaxis_title="Im",
-            xaxis=dict(scaleanchor='y', scaleratio=1, showgrid=True, zeroline=True, range=[-10, 10]),
-            yaxis=dict(scaleanchor='x', scaleratio=1, showgrid=True, zeroline=True, range=[-10, 10]),
-            width=600, height=600, showlegend=True
+        # ✅ x축, y축 선 (xref, yref 명시)
+        fig.add_shape(
+            type="line", x0=-5, y0=0, x1=5, y1=0,
+            line=dict(color="black", width=1), layer="below",
+            xref="x", yref="y"
         )
-        st.plotly_chart(fig)
+        fig.add_shape(
+            type="line", x0=0, y0=-5, x1=0, y1=5,
+            line=dict(color="black", width=1), layer="below",
+            xref="x", yref="y"
+        )
+
+        # ✅ 점들 추가
+        fig.add_trace(go.Scatter(x=[z.real], y=[z.imag], mode='markers',
+                                marker=dict(size=12, color='blue'), name='입력 z'))
+        fig.add_trace(go.Scatter(x=[w.real], y=[w.imag], mode='markers',
+                                marker=dict(size=12, color='red'), name='변환 결과 w'))
+        fig.add_trace(go.Scatter(x=[alpha.real], y=[alpha.imag], mode='markers',
+                                marker=dict(size=10, color='purple', symbol='x'), name='이동 전 수치 α'))
+        fig.add_trace(go.Scatter(x=[beta.real], y=[beta.imag], mode='markers',
+                                marker=dict(size=10, color='orange', symbol='x'), name='이동 후 수치 β'))
+
+        # ✅ 완전 고정 레이아웃
+        fig.update_layout(
+            autosize=False,  # 자동 크기 조정 금지
+            width=600,
+            height=600,
+            margin=dict(l=40, r=40, t=40, b=40),  # 그래프 외곽 여백 최소화
+            template=None,  # 기본 테마 제거 (자동 레이아웃 간섭 방지)
+            showlegend=True,
+            title="복소평면에서의 회전+평행이동 변환 시각화",
+            xaxis=dict(
+                title="Re",
+                range=[-5, 5],
+                showgrid=True,
+                zeroline=True,
+                fixedrange=True
+            ),
+            yaxis=dict(
+                title="Im",
+                range=[-5, 5],
+                showgrid=True,
+                zeroline=True,
+                fixedrange=True,
+                scaleanchor='x',
+                scaleratio=1
+            )
+        )
+
+        st.plotly_chart(fig, use_container_width=False)

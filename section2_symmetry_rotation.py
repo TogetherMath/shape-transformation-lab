@@ -76,8 +76,7 @@ def run_symmetry_rotation():
         # 🎯 대칭축 시각화 함수
         def draw_axis(fig, axis, angle, name, color):
             
-            st.write(f"📌 axis 파라미터로 들어온 값: '{axis}'") ####################
-            
+                        
             # ── 2) 통일된 axis_norm으로 분기 ──
             if axis == "x축":
                 fig.add_trace(go.Scatter(
