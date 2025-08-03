@@ -10,7 +10,7 @@ def reflection_matrix(axis_type, angle_deg=None):
         return np.array([[1, 0], [0, -1]])
     elif axis_type == 'y축':
         return np.array([[-1, 0], [0, 1]])
-    elif axis_type == 'y=ax':
+    elif axis_type == '직선y=ax':
         # 각도 → 라디안 → 기울기
         theta_rad = np.radians(angle_deg)
         a = np.tan(theta_rad)
@@ -33,20 +33,22 @@ def run_symmetry_rotation():
         st.subheader("🖱 입력 설정")
         st.markdown("⬇️ **아래 그래프를 클릭하여 파란 점의 위치를 바꿔보세요.**")
 
-        axis1 = st.selectbox("1️⃣ 첫 번째 대칭축", ["x축", "y축", "y=ax"], key="axis1")
-        if axis1 == "y=ax":
-            angle1 = st.number_input("x축과 이루는 각도 θ₁ (도)", value=45.0, key="angle1")
+        axis1 = st.selectbox("1️⃣ 첫 번째 대칭축", ["x축", "y축", "직선y=ax"], key="axis1")
+        if axis1 == "직선y=ax":
+            angle1 = st.number_input("x축과 이루는 각도 θ₁ (도)", value=45.0,
+                                     step=0.1, format="%.1f", key="angle1")
         else:
-            angle1 = None
+            angle1 = 45.0
 
-        axis2 = st.selectbox("2️⃣ 두 번째 대칭축", ["x축", "y축", "y=ax"], key="axis2")
-        if axis2 == "y=ax":
-            angle2 = st.number_input("x축과 이루는 각도 θ₂ (도)", value=-45.0, key="angle2")
+        axis2 = st.selectbox("2️⃣ 두 번째 대칭축", ["x축", "y축", "직선y=ax"], key="axis2")
+        if axis2 == "직선y=ax":
+            angle2 = st.number_input("x축과 이루는 각도 θ₂ (도)", value=-45.0,
+                                     step=0.1, format="%.1f", key="angle2")
         else:
-            angle2 = None
+            angle2 = -45.0
 
         st.markdown("🔵 입력점 | 🟢 1차 대칭 | 🔴 최종 대칭 결과")
-        st.markdown("🟣 축1 (보라색 선), ⚫ 축2 (회색 선)")
+        st.markdown("🟣 축1 (보라색 선), 🟠 축2 (주황색 선)")
 
     with col2:
         # 행렬
@@ -66,8 +68,7 @@ def run_symmetry_rotation():
         # 🎯 대칭축 시각화 함수
         def draw_axis(axis, angle, name, color):
             # ── 1) 공백 제거로 문자열 통일 ──
-           
-
+            
             # ── 2) 통일된 axis_norm으로 분기 ──
             if axis == "x축":
                 fig.add_trace(go.Scatter(
@@ -79,9 +80,10 @@ def run_symmetry_rotation():
                     x=[0, 0], y=[-5, 5], mode='lines',
                     line=dict(color=color, width=2), name=name
                 ))
-            elif axis == "y=ax":
-                if angle is None:
+            else:
+                if angle is None or not np.isfinite(angle):   # 🔧 추가된 보호 조건
                     angle = 45.0
+ 
                 theta = np.radians(angle)
                 a = np.tan(theta)
 
@@ -95,17 +97,9 @@ def run_symmetry_rotation():
 
                 fig.add_trace(go.Scatter(
                     x=x_vals, y=y_vals, mode='lines',
-                    line=dict(color=color, width=3, dash="dash"), name=name
+                    line=dict(color=color, width=3), name=name
                 ))
 
-
-
-        draw_axis(axis1, angle1 if angle1 is not None else 45.0, "🟣 축1", "purple")
-        # ✅ draw_axis 함수는 이미 정의되어 있다고 가정합니다.
-        
-        # 축2 그리기 (🟠 주황색, 점선, 굵기 3)
-        safe_angle2 = angle2 if angle2 is not None else -45.0
-        draw_axis(axis2, safe_angle2, "🟠 축2", "orange")
 
         # 점 시각화
         fig.add_trace(go.Scatter(x=[P0[0]], y=[P0[1]], mode='markers',
@@ -114,6 +108,11 @@ def run_symmetry_rotation():
                                  marker=dict(color='green', size=10), name='1차 대칭'))
         fig.add_trace(go.Scatter(x=[P2[0]], y=[P2[1]], mode='markers',
                                  marker=dict(color='red', size=10), name='최종 결과'))
+
+        draw_axis(axis1, angle1, "🟣 축1", "purple")
+            
+        draw_axis(axis2, angle2, "🟠 축2", "orange")
+
 
         result = plotly_events(fig, click_event=True, override_height=600)
         if result:
