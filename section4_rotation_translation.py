@@ -102,6 +102,7 @@ def run_rotation_translation():
             title="복소평면에서의 회전+평행이동 변환 시각화"
         )
 
+
         # ✅ 오른쪽 칼럼 내에서 그래프를 정중앙에 정렬
         gcol1, gcol2, gcol3 = st.columns([0.5, 5, 0.5])
         with gcol2:
