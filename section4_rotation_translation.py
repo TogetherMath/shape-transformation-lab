@@ -5,44 +5,44 @@ import plotly.graph_objs as go
 
 def run_rotation_translation():
     st.header("🟥 (4) 회전과 평행이동 시뮬레이터")
-    st.latex(r"w = (\cos\theta + i\sin\theta)(z + \alpha) + \beta")
     st.markdown("평행이동&회전이동&평행이동은 회전이동일까요? 회전의 기준점은?")
 
-    # 윗줄: alpha, theta, beta 입력
-    st.subheader("🔧 α, θ, β 값을 정해 보세요.")
-    upper_col1, upper_col2, upper_col3 = st.columns(3)
+    # ✅ 좌: 입력 / 우: 그래프
+    left_col, right_col = st.columns([1, 1.5])
 
-    with upper_col1:
-        st.markdown("**α (회전 이전 평행이동)**")
-        alpha_re = st.number_input("Re(α)", value=1.0, step=0.5, format="%.2f", key="alpha_re")
-        alpha_im = st.number_input("Im(α)", value=0.0, step=0.5, format="%.2f", key="alpha_im")
+    with left_col:
+        # 윗줄: alpha, theta, beta 입력
+        st.subheader("🔧 α, θ, β 값을 정해 보세요.")
+        st.latex(r"w = (\cos\theta + i\sin\theta)(z + \alpha) + \beta")
 
-    with upper_col2:
-        st.markdown("**θ (회전각, 도)**")
-        theta_deg = st.number_input("회전각 θ", value=45.0, step=1.0, format="%.1f")
-        theta_rad = np.radians(theta_deg)
-        cos_theta = np.cos(theta_rad)
-        sin_theta = np.sin(theta_rad)
+        upper_col1, upper_col2, upper_col3 = st.columns(3)
 
-    with upper_col3:
-        st.markdown("**β (회전 이후 평행이동)**")
-        beta_re = st.number_input("Re(β)", value=0.0, step=0.5, format="%.2f", key="beta_re")
-        beta_im = st.number_input("Im(β)", value=0.0, step=0.5, format="%.2f", key="beta_im")
+        with upper_col1:
+            st.markdown("**α (회전 이전 평행이동)**")
+            alpha_re = st.number_input("Re(α)", value=1.0, step=0.5, format="%.2f", key="alpha_re")
+            alpha_im = st.number_input("Im(α)", value=0.0, step=0.5, format="%.2f", key="alpha_im")
 
-    st.divider()
+        with upper_col2:
+            st.markdown("**θ (회전각, 도)**")
+            theta_deg = st.number_input("회전각 θ", value=45.0, step=1.0, format="%.1f")
+            theta_rad = np.radians(theta_deg)
+            cos_theta = np.cos(theta_rad)
+            sin_theta = np.sin(theta_rad)
 
-    # 아랫줄: z 입력 + 시각화
-    st.subheader("🖱 입력 복소수 z 와 변환 결과 w 시각화")
-    lower_col1, lower_col2 = st.columns([1, 1.5])
+        with upper_col3:
+            st.markdown("**β (회전 이후 평행이동)**")
+            beta_re = st.number_input("Re(β)", value=0.0, step=0.5, format="%.2f", key="beta_re")
+            beta_im = st.number_input("Im(β)", value=0.0, step=0.5, format="%.2f", key="beta_im")
 
-    with lower_col1:
+        st.divider()
+
+        # 아랫줄: z 입력
+        st.subheader("🖱 입력 복소수 z 와 변환 결과 w 시각화")
         st.markdown("**z = x + iy**")
         x = st.number_input("x (실수 부분)", value=2.0, step=0.5, format="%.2f", key="z_x")
         y = st.number_input("y (허수 부분)", value=1.0, step=0.5, format="%.2f", key="z_y")
 
-     
-
-    with lower_col2:
+    with right_col:
         # ✅ 복소수 정의 및 변환
         z = complex(x, y)
         alpha = complex(alpha_re, alpha_im)
@@ -102,4 +102,7 @@ def run_rotation_translation():
             )
         )
 
-        st.plotly_chart(fig, use_container_width=False)
+        # ✅ 오른쪽 칼럼 내에서 그래프를 정중앙에 정렬
+        gcol1, gcol2, gcol3 = st.columns([1, 3, 1])
+        with gcol2:
+            st.plotly_chart(fig, use_container_width=False)
