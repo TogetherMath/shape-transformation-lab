@@ -19,8 +19,8 @@ def run_rotation_translation():
 
         with upper_col1:
             st.markdown("**α (회전 이전 평행이동)**")
-            alpha_re = st.number_input("Re(α)", value=1.0, step=0.3, format="%.2f", key="alpha_re")
-            alpha_im = st.number_input("Im(α)", value=0.0, step=0.3, format="%.2f", key="alpha_im")
+            alpha_re = st.number_input("Re(α)", value=1.0, step=0.5, format="%.2f", key="alpha_re")
+            alpha_im = st.number_input("Im(α)", value=0.0, step=0.5, format="%.2f", key="alpha_im")
 
         with upper_col2:
             st.markdown("**θ (회전각, 도)**")
@@ -31,16 +31,16 @@ def run_rotation_translation():
 
         with upper_col3:
             st.markdown("**β (회전 이후 평행이동)**")
-            beta_re = st.number_input("Re(β)", value=0.0, step=0.3, format="%.2f", key="beta_re")
-            beta_im = st.number_input("Im(β)", value=-1.0, step=0.3, format="%.2f", key="beta_im")
+            beta_re = st.number_input("Re(β)", value=0.0, step=0.5, format="%.2f", key="beta_re")
+            beta_im = st.number_input("Im(β)", value=-1.0, step=0.5, format="%.2f", key="beta_im")
 
         st.divider()
 
         # 아랫줄: z 입력
         st.subheader("🖱 입력 복소수 z 와 변환 결과 w 시각화")
         st.markdown("**z = x + iy**")
-        x = st.number_input("x (실수 부분)", value=2.0, step=0.3, format="%.2f", key="z_x")
-        y = st.number_input("y (허수 부분)", value=1.0, step=0.3, format="%.2f", key="z_y")
+        x = st.number_input("x (실수 부분)", value=2.0, step=0.5, format="%.2f", key="z_x")
+        y = st.number_input("y (허수 부분)", value=1.0, step=0.5, format="%.2f", key="z_y")
 
     with right_col:
         # ✅ 복소수 정의 및 변환
@@ -55,12 +55,12 @@ def run_rotation_translation():
 
         # ✅ x축, y축 선 (xref, yref 명시)
         fig.add_shape(
-            type="line", x0=-10, y0=0, x1=10, y1=0,
+            type="line", x0=-8, y0=0, x1=8, y1=0,
             line=dict(color="black", width=1), layer="below",
             xref="x", yref="y"
         )
         fig.add_shape(
-            type="line", x0=0, y0=-10, x1=0, y1=10,
+            type="line", x0=0, y0=-8, x1=0, y1=8,
             line=dict(color="black", width=1), layer="below",
             xref="x", yref="y"
         )
@@ -78,18 +78,18 @@ def run_rotation_translation():
         # ✅ 완전 고정 레이아웃
                 # ✅ 완전 고정 레이아웃
         fig.update_layout(
-            width=800,
-            height=800,
+            width=900,
+            height=900,
             xaxis=dict(
                 title="Re",
-                range=[-10, 10],
+                range=[-8, 8],
                 showgrid=True,
                 zeroline=True,
                 fixedrange=True
             ),
             yaxis=dict(
                 title="Im",
-                range=[-10, 10],
+                range=[-8, 8],
                 showgrid=True,
                 zeroline=True,
                 fixedrange=True,
