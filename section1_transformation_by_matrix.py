@@ -143,10 +143,10 @@ def run_transformation_by_matrix():
             shape = np.stack([x_vals, y_vals], axis=1)
 
         st.subheader("# 2×2 변환 행렬 입력 ___________________")
-        a11 = st.number_input("a11", value=1.0, step=0.1, format="%.1f")
-        a12 = st.number_input("a12", value=-1.0, step=0.1, format="%.1f")
-        a21 = st.number_input("a21", value=1.0, step=0.1, format="%.1f")
-        a22 = st.number_input("a22", value=2.0, step=0.1, format="%.1f")
+        a11 = st.number_input("a11", value=1.0, step=0.5, format="%.1f")
+        a12 = st.number_input("a12", value=-1.0, step=0.5, format="%.1f")
+        a21 = st.number_input("a21", value=1.0, step=0.5, format="%.1f")
+        a22 = st.number_input("a22", value=2.0, step=0.5, format="%.1f")
         matrix = np.array([[a11, a12], [a21, a22]])
 
     with col2:
