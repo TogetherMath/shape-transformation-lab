@@ -121,6 +121,19 @@ def run_symmetry_rotation():
             
         draw_axis(axis2, angle2, "🟠 축2", "orange")
 
+        # ✅ 원점과 입력점, 최종점 연결선 추가
+        fig.add_trace(go.Scatter(
+            x=[0, P0[0]], y=[0, P0[1]], mode='lines',
+            line=dict(color='blue', width=2, dash='dot'),
+            name='입력점→원점'
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=[0, P2[0]], y=[0, P2[1]], mode='lines',
+            line=dict(color='red', width=2, dash='dot'),
+            name='최종점→원점'
+        ))
+
 
         result = plotly_events(fig, click_event=True, override_height=600)
         if result:
