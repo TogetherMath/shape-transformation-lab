@@ -74,8 +74,9 @@ def run_symmetry_rotation():
                           width=600, height=600)
 
         # 🎯 대칭축 시각화 함수
-        def draw_axis(axis, angle, name, color):
-            # ── 1) 공백 제거로 문자열 통일 ──
+        def draw_axis(fig, axis, angle, name, color):
+            
+            st.write(f"📌 axis 파라미터로 들어온 값: '{axis}'") ####################
             
             # ── 2) 통일된 axis_norm으로 분기 ──
             if axis == "x축":
@@ -95,18 +96,24 @@ def run_symmetry_rotation():
                 theta = np.radians(angle)
                 a = np.tan(theta)
 
+
+
+
                 # ── 기울기에 따라 화면 안에 들어오도록 축 범위 조정 ──
                 if abs(a) <= 1:
-                    x_vals = np.array([-5, 5])
-                    y_vals = a * x_vals
+                    x1=-5; x2=5
+                    y1=a*x1; y2=a*x2
+                    
                 else:
-                    y_vals = np.array([-5, 5])
-                    x_vals = y_vals / a
-
+                    y1=-5; y2=5
+                    x1=y1/a; x2=y2/a
+                                           
                 fig.add_trace(go.Scatter(
-                    x=x_vals, y=y_vals, mode='lines',
-                    line=dict(color=color, width=5), name=name
+                    x=[x1, x2], y=[y1, y2], mode='lines',
+                    line=dict(color=color, width=2), name=name
                 ))
+
+               
 
 
         # 점 시각화
@@ -117,9 +124,9 @@ def run_symmetry_rotation():
         fig.add_trace(go.Scatter(x=[P2[0]], y=[P2[1]], mode='markers',
                                  marker=dict(color='red', size=10), name='최종 결과'))
 
-        draw_axis(axis1, angle1, "🟣 축1", "purple")
+        draw_axis(fig, axis1, angle1, "🟣 축1", "purple")
             
-        draw_axis(axis2, angle2, "🟠 축2", "orange")
+        draw_axis(fig, axis2, angle2, "🟠 축2", "orange")
 
         # ✅ 원점과 입력점, 최종점 연결선 추가
         fig.add_trace(go.Scatter(
