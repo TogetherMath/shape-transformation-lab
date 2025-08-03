@@ -19,28 +19,28 @@ def run_rotation_translation():
 
         with upper_col1:
             st.markdown("**α (회전 이전 평행이동)**")
-            alpha_re = st.number_input("Re(α)", value=1.0, step=0.5, format="%.2f", key="alpha_re")
-            alpha_im = st.number_input("Im(α)", value=0.0, step=0.5, format="%.2f", key="alpha_im")
+            alpha_re = st.number_input("Re(α)", value=1.0, step=0.3, format="%.2f", key="alpha_re")
+            alpha_im = st.number_input("Im(α)", value=0.0, step=0.3, format="%.2f", key="alpha_im")
 
         with upper_col2:
             st.markdown("**θ (회전각, 도)**")
-            theta_deg = st.number_input("회전각 θ", value=45.0, step=1.0, format="%.1f")
+            theta_deg = st.number_input("회전각 θ", value=45.0, step=5.0, format="%.1f")
             theta_rad = np.radians(theta_deg)
             cos_theta = np.cos(theta_rad)
             sin_theta = np.sin(theta_rad)
 
         with upper_col3:
             st.markdown("**β (회전 이후 평행이동)**")
-            beta_re = st.number_input("Re(β)", value=0.0, step=0.5, format="%.2f", key="beta_re")
-            beta_im = st.number_input("Im(β)", value=0.0, step=0.5, format="%.2f", key="beta_im")
+            beta_re = st.number_input("Re(β)", value=0.0, step=0.3, format="%.2f", key="beta_re")
+            beta_im = st.number_input("Im(β)", value=-1.0, step=0.3, format="%.2f", key="beta_im")
 
         st.divider()
 
         # 아랫줄: z 입력
         st.subheader("🖱 입력 복소수 z 와 변환 결과 w 시각화")
         st.markdown("**z = x + iy**")
-        x = st.number_input("x (실수 부분)", value=2.0, step=0.5, format="%.2f", key="z_x")
-        y = st.number_input("y (허수 부분)", value=1.0, step=0.5, format="%.2f", key="z_y")
+        x = st.number_input("x (실수 부분)", value=2.0, step=0.3, format="%.2f", key="z_x")
+        y = st.number_input("y (허수 부분)", value=1.0, step=0.3, format="%.2f", key="z_y")
 
     with right_col:
         # ✅ 복소수 정의 및 변환
@@ -55,12 +55,12 @@ def run_rotation_translation():
 
         # ✅ x축, y축 선 (xref, yref 명시)
         fig.add_shape(
-            type="line", x0=-5, y0=0, x1=5, y1=0,
+            type="line", x0=-10, y0=0, x1=10, y1=0,
             line=dict(color="black", width=1), layer="below",
             xref="x", yref="y"
         )
         fig.add_shape(
-            type="line", x0=0, y0=-5, x1=0, y1=5,
+            type="line", x0=0, y0=-10, x1=0, y1=10,
             line=dict(color="black", width=1), layer="below",
             xref="x", yref="y"
         )
@@ -76,33 +76,33 @@ def run_rotation_translation():
                                 marker=dict(size=10, color='orange', symbol='x'), name='이동 후 수치 β'))
 
         # ✅ 완전 고정 레이아웃
+                # ✅ 완전 고정 레이아웃
         fig.update_layout(
-            autosize=False,  # 자동 크기 조정 금지
-            width=600,
-            height=600,
-            margin=dict(l=40, r=40, t=40, b=40),  # 그래프 외곽 여백 최소화
-            template=None,  # 기본 테마 제거 (자동 레이아웃 간섭 방지)
-            showlegend=True,
-            title="복소평면에서의 회전+평행이동 변환 시각화",
+            width=800,
+            height=800,
             xaxis=dict(
                 title="Re",
-                range=[-5, 5],
+                range=[-10, 10],
                 showgrid=True,
                 zeroline=True,
                 fixedrange=True
             ),
             yaxis=dict(
                 title="Im",
-                range=[-5, 5],
+                range=[-10, 10],
                 showgrid=True,
                 zeroline=True,
                 fixedrange=True,
-                scaleanchor='x',
-                scaleratio=1
-            )
+                scaleanchor="x",
+                scaleratio=1,
+                constrain='domain'  # ✅ 이 줄이 핵심입니다!
+            ),
+            margin=dict(l=40, r=40, t=40, b=40),
+            showlegend=True,
+            title="복소평면에서의 회전+평행이동 변환 시각화"
         )
 
         # ✅ 오른쪽 칼럼 내에서 그래프를 정중앙에 정렬
-        gcol1, gcol2, gcol3 = st.columns([1, 3, 1])
+        gcol1, gcol2, gcol3 = st.columns([0.5, 5, 0.5])
         with gcol2:
             st.plotly_chart(fig, use_container_width=False)
