@@ -22,6 +22,8 @@ def run_symmetry_rotation():
     st.header("(2) 두 번의 대칭이동 시뮬레이터")
     st.caption("두 축 대칭의 결과가 회전과 같음을 시각적으로 관찰해 보세요.")
 
+
+
     # 초기 점
     if 'selected_point' not in st.session_state:
         st.session_state.selected_point = np.array([2.0, 1.0])
@@ -31,7 +33,13 @@ def run_symmetry_rotation():
 
     with col1:
         st.subheader("🖱 입력 설정")
-        st.markdown("⬇️ **아래 그래프를 클릭하여 파란 점의 위치를 바꿔보세요.**")
+        st.markdown("⬇️ **초기점과 2개의 대칭축을 입력하여 변환된 점을 관찰해 보세요.**")
+
+        # ✅ 초기 점 좌표 입력 (← 이 부분이 새로 추가될 영역입니다)
+        st.markdown("🔵 **초기점 좌표를 입력하세요.(-5와 5사이)**")
+        x0 = st.number_input("x 좌표", value=2.0, step=0.3, format="%.2f", key="input_x")
+        y0 = st.number_input("y 좌표", value=1.0, step=0.3, format="%.2f", key="input_y")
+        st.session_state.selected_point = np.array([x0, y0])
 
         axis1 = st.selectbox("1️⃣ 첫 번째 대칭축", ["x축", "y축", "직선y=ax"], key="axis1")
         if axis1 == "직선y=ax":
@@ -97,7 +105,7 @@ def run_symmetry_rotation():
 
                 fig.add_trace(go.Scatter(
                     x=x_vals, y=y_vals, mode='lines',
-                    line=dict(color=color, width=3), name=name
+                    line=dict(color=color, width=5), name=name
                 ))
 
 
