@@ -71,9 +71,9 @@ def run_rotation_translation():
         fig.add_trace(go.Scatter(x=[w.real], y=[w.imag], mode='markers',
                                 marker=dict(size=12, color='red'), name='변환 결과 w'))
         fig.add_trace(go.Scatter(x=[alpha.real], y=[alpha.imag], mode='markers',
-                                marker=dict(size=10, color='purple', symbol='x'), name='이동 전 수치 α'))
+                                marker=dict(size=10, color='purple', symbol='x'), name='첫번째 평행이동 α'))
         fig.add_trace(go.Scatter(x=[beta.real], y=[beta.imag], mode='markers',
-                                marker=dict(size=10, color='orange', symbol='x'), name='이동 후 수치 β'))
+                                marker=dict(size=10, color='orange', symbol='x'), name='두번째 평행이동 β'))
 
         # ✅ 완전 고정 레이아웃
                 # ✅ 완전 고정 레이아웃
