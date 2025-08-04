@@ -3,3 +3,4 @@ numpy
 matplotlib
 plotly
 fonts
+streamlit-plotly-events
